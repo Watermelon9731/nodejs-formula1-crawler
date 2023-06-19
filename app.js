@@ -1,5 +1,6 @@
 const createError = require("http-errors");
 const express = require("express");
+const http = require("http");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
@@ -10,23 +11,6 @@ const racesRouter = require("./routes/races");
 
 const app = express();
 
-// setup cheerio and request-promise
-// const cheerio = require("cheerio");
-// const request = require("request-promise");
-// const target = "https://formula1.com/en/latest.html";
-// request(target, (err, res, html) => {
-//   if (!err && res.statusCode == 200) {
-//     const $ = cheerio.load(html);
-
-//     $(".f1-cc--caption").each((idx, el) => {
-//       const article = $(el).find(".f1-cc--caption p").text();
-//       console.log(article);
-//     });
-//   } else {
-//     console.log(err);
-//   }
-// });
-
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
@@ -36,6 +20,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 
 app.use(indexRouter);
 app.use(usersRouter);

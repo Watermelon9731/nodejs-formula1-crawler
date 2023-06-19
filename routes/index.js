@@ -1,5 +1,5 @@
 const express = require("express");
-const getLatestPageData = require("../service/dataCrawl");
+const { getLatestPageData } = require("../service/dataCrawl");
 const router = express.Router();
 
 /* GET home page. */

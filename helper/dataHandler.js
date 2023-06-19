@@ -4,7 +4,6 @@ const trimWhiteSpace = (rawStr = String) => {
 };
 
 const articleFilter = (rawData = Array) => {
-
   return rawData.map((item, idx) => {
     const separate = item[idx].split(":");
     let content = separate[1];
@@ -26,4 +25,52 @@ const articleFilter = (rawData = Array) => {
   });
 };
 
-module.exports = { trimWhiteSpace, articleFilter };
+const handleTableData = (tableData) => {
+  for (const idx in tableData) {
+    tableData[idx].forEach((item) => {
+      delete item[0];
+      delete item[7];
+      for (const key in item) {
+        item[key] = trimWhiteSpace(item[key]);
+      }
+    });
+  }
+  return tableData
+};
+
+const handleRaceResultsData = (cheerioLoad, loadTableClassName) => {
+  const rawTableData = {
+    head: [],
+    body: [],
+  };
+
+  const listTarget = [
+    { field: "head", parent: "thead tr", child: "th" },
+    { field: "body", parent: "tbody tr", child: "td" },
+  ];
+
+  const table = cheerioLoad(loadTableClassName);
+
+  listTarget.forEach((item) => {
+    // $ = cheerio.load(html)
+    // cheerioLoad = $
+    // table = $(".loadTableClassName")
+    table.find(item.parent).each((i, field) => {
+      const fieldData = {};
+
+      cheerioLoad(field)
+        .find(item.child)
+        .each((j, cell) => {
+          fieldData[j] = cheerioLoad(cell).text();
+        });
+
+      rawTableData[item.field].push(fieldData);
+    });
+  });
+
+  const tableData = handleTableData(rawTableData);
+
+  return tableData;
+};
+
+module.exports = { trimWhiteSpace, articleFilter, handleRaceResultsData };
